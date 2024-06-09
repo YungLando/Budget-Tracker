@@ -1,14 +1,154 @@
 {% comment %} {% extends "basic_general.html" %} {% endcomment %}
 
 {% block content %}
-    <h1>Dashboard<h1/>
-    <p>Total Income: {{ total_income }}</p>
-    <p>Total Expense: {{ total_expense }}</p>
-    <h2>Incomes</h2>
-    <ul>
-        {% for income in incomes%}
-            <li>{{ income.source }}: {{ income.amount }}</li>
-        {% endfor %}
-    </ul>
-    <a href= "{% url 'add_expense' %}">Add Expense</a>
+<html>
+    <head>
+        <title>Dashboard</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        <style>
+            body {
+                font-family: 'Roboto', sans-serif;
+                background-color: #f0f2f5;
+                margin: 0;
+                padding: 0;
+            }
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+            .header {
+                background-color: #4CAF50;
+                color: white;
+                padding: 20px;
+                text-align: center;
+            }
+            .cards {
+                display: flex;
+                justify-content: space-around;
+                margin-top: 20px;
+            }
+            .card {
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                width: 30%;
+                text-align: center;
+            }
+            .card i {
+                font-size: 2em;
+                margin-bottom: 10px;
+                color: #4CAF50;
+            }
+            .transactions {
+                margin-top: 20px;
+            }
+            .transactions table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            .transactions th, .transactions td {
+                border: 1px solid #ddd;
+                padding: 12px;
+                position: relative;
+            }
+            .transactions th {
+                background-color: #4CAF50;
+                color: white;
+                text-align: left;
+            }
+            .delete-icon{
+                color:red;
+                cursor: pointer;
+                display: none;
+                position: absolute;
+                top: 50%;
+                right: 10px;
+                transform: translateY(-50%);
+            }
+            .transactions tr:hover .delete-icon{
+                display: inline;
+            }
+            .button {
+                display: inline-block;
+                padding: 10px 20px;
+                color: white;
+                background-color: #4CAF50;
+                text-decoration: none;
+                border-radius: 5px;
+                margin-top: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>Dashboard</h1>
+        </div>
+        <div class="container">
+            <div class="cards">
+                <div class="card">
+                    <i class="fas fa-wallet"></i>
+                    <h2>Total Income</h2>
+                    <p> ${{ total_income }} </p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <h2>Total Expenses</h2>
+                    <p> ${{ total_expense }} </p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-piggy-bank"></i>
+                    <h2>Net Income</h2>
+                    <p> ${{ net_income }}</p>
+                </div>
+            </div>
+            <div class="transactions">
+                <h2>Recent Transactions</h2>
+                <h3>Income</h3>
+                <table>
+                    <tr>
+                        <th>Date</th>
+                        <th>Source</th>
+                        <th>Amount</th>
+                        <th>Action</th>
+                    </tr>
+                    {% for income in incomes %}
+                    <tr>
+                        <td>{{ income.date }}</td>
+                        <td>{{ income.source }}</td>
+                        <td>${{ income.amount }}</td>
+                        <td>
+                            <a href="{% url 'delete_income' income.id %}" class="delete-icon"><i class="fas fa-trash"></i></a>
+                        </td>
+                    </tr>
+                    
+                    {% endfor %}
+                </table>
+                <a href="{% url 'add_income' %}" class="button">Add Income</a>
+                <h3>Expenses</h3>
+                <table>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Action</th>
+                    </tr>
+                    {% for expense in expenses %}
+                    <tr>
+                        <td>{{ expense.date }}</td>
+                        <td>{{ expense.description }}</td>
+                        <td>${{ expense.amount }}</td>
+                        <td>
+                            <a href="{% url 'delete_expense' expense.id %}" class="delete-icon"><i class="fas fa-trash"></i></a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            
+            <a href="{% url 'add_expense' %}" class="button">Add Expense</a>
+        </div>
+    </body>
+    </html>
 {% endblock %}

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Income, Expense
 from .forms import IncomeForm, ExpenseForm
 from django.contrib.auth.decorators import login_required
@@ -15,7 +15,8 @@ def dashboard(request):
         'incomes': incomes,
         'expenses': expenses,
         'total_income': total_income,
-        'total_expense': total_expense
+        'total_expense': total_expense,
+        'net_income': net_income
     }
 
     return render(request, 'expenses/dashboard.html', context)
@@ -31,7 +32,7 @@ def add_income(request):
             return redirect('dashboard')
     else:
         form = IncomeForm()
-    return render(request, 'add_income.html', {'form': form})
+    return render(request, 'expenses/add_income.html', {'form': form})
 
 @login_required
 def add_expense(request):
@@ -44,4 +45,16 @@ def add_expense(request):
             return redirect('dashboard')
     else:
         form = ExpenseForm()
-    return render(request, 'add_expense.html', {'form': form})
+    return render(request, 'expenses/add_expense.html', {'form': form})
+
+@login_required
+def delete_income(request, income_id):
+    income = get_object_or_404(Income, id = income_id, user = request.user)
+    income.delete()
+    return redirect('dashboard')
+
+@login_required
+def delete_expense(request, expense_id):
+    expense = get_object_or_404(Income, id = expense_id, user = request.user)
+    expense.delete()
+    return redirect('dashboard')
