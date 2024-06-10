@@ -22,4 +22,13 @@ urlpatterns = [
     path('add_expense/', views.add_expense, name = 'add_expense'),
     path('delete_income/<int:income_id>/', views.delete_income, name = 'delete_income'),
     path('delete_expense/<int:expense_id>/', views.delete_expense, name = 'delete_expense'),
+    path('api/delete_income/<int:income_id>/', views.api_delete_income, name = 'api_delete_income'),
+    path('api/delete_expense/<int:expense_id>/', views.api_delete_expense, name = 'api_delete_expense'),
+    path('monthly/', views.monthly, name='monthly'),
+    path('add_monthly_income/', views.add_monthly_income, name='add_monthly_income'),
+    path('add_monthly_expense/', views.add_monthly_expense, name='add_monthly_expense'),
+    path('delete_monthly_income/<int:income_id>/', views.delete_monthly_income, name='delete_monthly_income'),
+    path('delete_monthly_expense/<int:expense_id>/', views.delete_monthly_expense, name='delete_monthly_expense'),
+    path('api/delete_monthly_income/<int:income_id>/', views.api_delete_monthly_income, name='api_delete_monthly_income'),
+    path('api/delete_monthly_expense/<int:expense_id>/', views.api_delete_monthly_expense, name='api_delete_monthly_expense'),
 ]

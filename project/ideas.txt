@@ -1,0 +1,8 @@
+ideas
+taxes
+api for bank account
+api for digital subscriptions
+see what category causes most expenses
+graph for spending per month
+could use a pie chart where if you hover over it shows category percentages
+stock market tracker that incorporates money gained/lossed from market

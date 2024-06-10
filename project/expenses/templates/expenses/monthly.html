@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Monthly Expenses{% endblock %}
+
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function updateTotals() {
+        let totalIncome = 0;
+        let totalExpense = 0;
+
+        $('.income-amount').each(function() {
+            totalIncome += parseFloat($(this).data('amount'));
+        });
+
+        $('.expense-amount').each(function() {
+            totalExpense += parseFloat($(this).data('amount'));
+        });
+
+        $('#total-income').text('$' + totalIncome.toFixed(2));
+        $('#total-expense').text('$' + totalExpense.toFixed(2));
+        $('#net-income').text('$' + (totalIncome - totalExpense).toFixed(2));
+    }
+
+    function deleteItem(url, row) {
+        console.log("Sending delete request to:", url); // Debugging statement
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    row.remove();
+                    updateTotals();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('An error occurred. Please try again.');
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        $('.delete-monthly-income').click(function() {
+            var url = $(this).data('url');
+            var row = $(this).closest('tr');
+            console.log("Delete button clicked for monthly income:", url); // Debugging statement
+            deleteItem(url, row);
+        });
+
+        $('.delete-monthly-expense').click(function() {
+            var url = $(this).data('url');
+            var row = $(this).closest('tr');
+            console.log("Delete button clicked for monthly expense:", url); // Debugging statement
+            deleteItem(url, row);
+        });
+
+        updateTotals();
+    });
+</script>
+<div class="container">
+    <h2>Monthly Overview</h2>
+    <div class="cards">
+        <div class="card">
+            <i class="fas fa-wallet"></i>
+            <h2>Total Monthly Income</h2>
+            <p id="total-income">${{ total_income }}</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-money-bill-wave"></i>
+            <h2>Total Monthly Expenses</h2>
+            <p id="total-expense">${{ total_expense }}</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-piggy-bank"></i>
+            <h2>Net Monthly Income</h2>
+            <p id="net-income">${{ net_income }}</p>
+        </div>
+    </div>
+    <div class="transactions">
+        <h2>Monthly Incomes</h2>
+        <table>
+            <tr>
+                <th>Source</th>
+                <th>Amount</th>
+                <th>Action</th>
+            </tr>
+            {% for income in incomes %}
+            <tr>
+                <td>{{ income.source }}</td>
+                <td class="income-amount" data-amount="{{ income.amount }}">${{ income.amount }}</td>
+                <td>
+                    <i class="fas fa-trash delete-icon delete-monthly-income" data-url="{% url 'api_delete_monthly_income' income.id %}"></i>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <a href="{% url 'add_monthly_income' %}" class="button">Add Monthly Income</a>
+        <h2>Monthly Expenses</h2>
+        <table>
+            <tr>
+                <th>Category</th>
+                {% comment %} <th>Description</th> {% endcomment %}
+                <th>Amount</th>
+                <th>Action</th>
+            </tr>
+            {% for expense in expenses %}
+            <tr>
+                <td>{{ expense.category }}</td>
+                <td class="expense-amount" data-amount="{{ expense.amount }}">${{ expense.amount }}</td>
+                <td>
+                    <i class="fas fa-trash delete-icon delete-monthly-expense" data-url="{% url 'api_delete_monthly_expense' expense.id %}"></i>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <a href="{% url 'add_monthly_expense' %}" class="button">Add Monthly Expense</a>
+    </div>
+</div>
+
+{% endblock %}
