@@ -9,7 +9,7 @@ class IncomeForm(forms.ModelForm):
 class ExpenseForm(forms.ModelForm):
     class Meta:
         model = Expense
-        fields = ['description', 'category', 'amount', 'date']
+        fields = ['category', 'amount', 'date']
 
 class MonthlyIncomeForm(forms.ModelForm):
     class Meta:
@@ -19,4 +19,4 @@ class MonthlyIncomeForm(forms.ModelForm):
 class MonthlyExpenseForm(forms.ModelForm):
     class Meta:
         model = MonthlyExpense
-        fields = ['category', 'description', 'amount']
+        fields = ['category', 'amount']

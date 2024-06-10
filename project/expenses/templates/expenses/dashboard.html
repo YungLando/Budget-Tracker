@@ -1,207 +1,132 @@
-{% extends "base.html" %} 
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<html>
-    <head>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-        <style>
-            {% comment %} body {
-                font-family: 'Roboto', sans-serif;
-                background-color: #f0f2f5;
-                margin: 0;
-                padding: 0;
-            }
-            .container {
-                max-width: 1200px;
-                margin: 0 auto;
-                padding: 20px;
-            }
-            .header {
-                background-color: #4CAF50;
-                color: white;
-                padding: 20px;
-                text-align: center;
-            }
-            .cards {
-                display: flex;
-                justify-content: space-around;
-                margin-top: 20px;
-            }
-            .card {
-                background-color: #fff;
-                padding: 20px;
-                border-radius: 10px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                width: 30%;
-                text-align: center;
-            }
-            .card i {
-                font-size: 2em;
-                margin-bottom: 10px;
-                color: #4CAF50;
-            }
-            .transactions {
-                margin-top: 20px;
-            }
-            .transactions table {
-                width: 100%;
-                border-collapse: collapse;
-                table-layout: fixed;
-            }
-            .transactions th, .transactions td {
-                border: 1px solid #ddd;
-                padding: 12px;
-                position: relative;
-                word-wrap: break-word;
-            }
-            .transactions th {
-                background-color: #4CAF50;
-                color: white;
-                text-align: left;
-                
-            }
-            .delete-icon{
-                color:red;
-                cursor: pointer;
-                display: none;
-                position: absolute;
-                top: 50%;
-                right: 10px;
-                transform: translateY(-50%);
-            }
-            .transactions tr:hover .delete-icon{
-                display: inline;
-            }
-            .button {
-                display: inline-block;
-                padding: 10px 20px;
-                color: white;
-                background-color: #4CAF50;
-                text-decoration: none;
-                border-radius: 5px;
-                margin-top: 20px;
-            } {% endcomment %}
-        </style>
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script>
-            function updateTotals() {
-                let totalIncome = 0;
-                let totalExpense = 0;
-
-                $('.income-amount').each(function() {
-                    totalIncome += parseFloat($(this).data('amount'));
-                });
-
-                $('.expense-amount').each(function() {
-                    totalExpense += parseFloat($(this).data('amount'));
-                });
-
-                $('#total-income').text('$' + totalIncome.toFixed(2));
-                $('#total-expense').text('$' + totalExpense.toFixed(2));
-                $('#net-income').text('$' + (totalIncome - totalExpense).toFixed(2));
-            }
-
-            function deleteItem(url, row) {
-                $.ajax({
-                    url: url,
-                    method: 'POST',
-                    data: {
-                        csrfmiddlewaretoken: '{{ csrf_token }}'
-                    },
-                    success: function(response) {
-                        if (response.status === 'success') {
-                            row.remove();
-                            updateTotals();
-                        } else {
-                            alert(response.message);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        alert('An error occurred. Please try again.');
-                    }
-                });
-            }
-
-            $(document).ready(function() {
-                $('.delete-income').click(function() {
-                    var url = $(this).data('url');
-                    var row = $(this).closest('tr');
-                    deleteItem(url, row);
-                });
-
-                $('.delete-expense').click(function() {
-                    var url = $(this).data('url');
-                    var row = $(this).closest('tr');
-                    deleteItem(url, row);
-                });
-
-                updateTotals();
-            });
-        </script>
-    </head>
-    <body>
-        <div class="container">
-            <div class="cards">
-                <div class="card">
-                    <i class="fas fa-wallet"></i>
-                    <h2>Total Income</h2>
-                    <p id="total-income">${{ total_income }}</p>
-                </div>
-                <div class="card">
-                    <i class="fas fa-money-bill-wave"></i>
-                    <h2>Total Expenses</h2>
-                    <p id="total-expense">${{ total_expense }}</p>
-                </div>
-                <div class="card">
-                    <i class="fas fa-piggy-bank"></i>
-                    <h2>Net Income</h2>
-                    <p id="net-income">${{ net_income }}</p>
-                </div>
-            </div>
-            <div class="transactions">
-                <h2>Recent Transactions</h2>
-                <h3>Incomes</h3>
-                <table>
-                    <tr>
-                        <th style="width: 25%;">Date</th>
-                        <th style="width: 25%;">Source</th>
-                        <th style="width: 25%;">Amount</th>
-                        <th style="width: 25%;">Action</th>
-                    </tr>
-                    {% for income in incomes %}
-                    <tr>
-                        <td>{{ income.date }}</td>
-                        <td>{{ income.source }}</td>
-                        <td class="income-amount" data-amount="{{ income.amount }}">${{ income.amount }}</td>
-                        <td>
-                            <i class="fas fa-trash delete-icon delete-income" data-url="{% url 'api_delete_income' income.id %}"></i>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </table>
-                <a href="{% url 'add_income' %}" class="button">Add Income</a>
-                <h3>Expenses</h3>
-                <table>
-                    <tr>
-                        <th style="width: 25%;">Date</th>
-                        <th style="width: 25%;">Description</th>
-                        <th style="width: 25%;">Amount</th>
-                        <th style="width: 25%;">Action</th>
-                    </tr>
-                    {% for expense in expenses %}
-                    <tr>
-                        <td>{{ expense.date }}</td>
-                        <td>{{ expense.description }}</td>
-                        <td class="expense-amount" data-amount="{{ expense.amount }}">${{ expense.amount }}</td>
-                        <td>
-                            <i class="fas fa-trash delete-icon delete-expense" data-url="{% url 'api_delete_expense' expense.id %}"></i>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-            <a href="{% url 'add_expense' %}" class="button">Add Expense</a>
+<div class="container">
+    <h2>Dashboard</h2>
+    <div class="cards">
+        <div class="card">
+            <i class="fas fa-wallet"></i>
+            <h2>Total Income</h2>
+            <p id="total-income">${{ total_income }}</p>
         </div>
-    </body>
-    </html>
+        <div class="card">
+            <i class="fas fa-money-bill-wave"></i>
+            <h2>Total Expenses</h2>
+            <p id="total-expense">${{ total_expense }}</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-piggy-bank"></i>
+            <h2>Net Income</h2>
+            <p id="net-income">${{ net_income }}</p>
+        </div>
+    </div>
+    <div class="transactions">
+        <h2>Incomes</h2>
+        <table>
+            <tr>
+                <th>Source</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
+            {% for income in incomes %}
+            <tr>
+                <td>{{ income.source }}</td>
+                <td class="income-amount" data-amount="{{ income.amount }}">${{ income.amount }}</td>
+                <td>
+                    <i class="fas fa-trash delete-icon delete-income" data-url="{% url 'api_delete_income' income.id %}"></i>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <form method="post">
+            {% csrf_token %}
+            {{ income_form.as_p }}
+            <button type="submit" name="income_submit">Add Income</button>
+        </form>
+        <h2>Expenses</h2>
+        <table>
+            <tr>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
+            {% for expense in expenses %}
+            <tr>
+                <td>{{ expense.category }}</td>
+                <td class="expense-amount" data-amount="{{ expense.amount }}">${{ expense.amount }}</td>
+                <td>
+                    <i class="fas fa-trash delete-icon delete-expense" data-url="{% url 'api_delete_expense' expense.id %}"></i>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <form method="post">
+            {% csrf_token %}
+            {{ expense_form.as_p }}
+            <button type="submit" name="expense_submit">Add Expense</button>
+        </form>
+    </div>
+</div>
+<script>
+    function deleteItem(url, row) {
+        console.log("Sending delete request to:", url); // Debugging statement
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    row.remove();
+                    updateTotals();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('An error occurred. Please try again.');
+            }
+        });
+    }
+
+    function updateTotals() {
+        let totalIncome = 0;
+        let totalExpense = 0;
+
+        $('.income-amount').each(function() {
+            totalIncome += parseFloat($(this).data('amount'));
+        });
+
+        $('.expense-amount').each(function() {
+            totalExpense += parseFloat($(this).data('amount'));
+        });
+
+        $('#total-income').text('$' + totalIncome.toFixed(2));
+        $('#total-expense').text('$' + totalExpense.toFixed(2));
+        $('#net-income').text('$' + (totalIncome - totalExpense).toFixed(2));
+    }
+
+    $(document).ready(function() {
+        $('.delete-income').click(function() {
+            var url = $(this).data('url');
+            var row = $(this).closest('tr');
+            console.log("Delete button clicked for income:", url); // Debugging statement
+            deleteItem(url, row);
+        });
+
+        $('.delete-expense').click(function() {
+            var url = $(this).data('url');
+            var row = $(this).closest('tr');
+            console.log("Delete button clicked for expense:", url); // Debugging statement
+            deleteItem(url, row);
+        });
+
+        updateTotals();
+    });
+</script>
 {% endblock %}

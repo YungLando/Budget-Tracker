@@ -6,3 +6,4 @@ see what category causes most expenses
 graph for spending per month
 could use a pie chart where if you hover over it shows category percentages
 stock market tracker that incorporates money gained/lossed from market
+have a monthly accrue based off my estimated budget, and then how much i actually spent

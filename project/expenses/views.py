@@ -7,19 +7,47 @@ from django.http import JsonResponse
 # Create your views here.
 @login_required
 def dashboard(request):
-    incomes = Income.objects.filter(user = request.user)
-    expenses = Expense.objects.filter(user = request.user)
+    incomes = Income.objects.filter(user=request.user)
+    expenses = Expense.objects.filter(user=request.user)
+
     total_income = sum(income.amount for income in incomes)
     total_expense = sum(expense.amount for expense in expenses)
     net_income = total_income - total_expense
+
+    if request.method == 'POST':
+        if 'income_submit' in request.POST:
+            income_form = IncomeForm(request.POST)
+            if income_form.is_valid():
+                income = income_form.save(commit=False)
+                income.user = request.user
+                income.save()
+                return redirect('dashboard')
+        else:
+            income_form = IncomeForm()
+
+        if 'expense_submit' in request.POST:
+            expense_form = ExpenseForm(request.POST)
+            if expense_form.is_valid():
+                expense = expense_form.save(commit=False)
+                expense.user = request.user
+                expense.save()
+                return redirect('dashboard')
+        else:
+            expense_form = ExpenseForm()
+    else:
+        income_form = IncomeForm()
+        expense_form = ExpenseForm()
+
     context = {
         'incomes': incomes,
         'expenses': expenses,
         'total_income': total_income,
         'total_expense': total_expense,
-        'net_income': net_income
+        'net_income': net_income,
+        'income_form': income_form,
+        'expense_form': expense_form
     }
-
+    
     return render(request, 'expenses/dashboard.html', context)
 
 @login_required
@@ -87,16 +115,41 @@ def monthly(request):
     total_expense = sum(expense.amount for expense in expenses)
     net_income = total_income - total_expense
 
+    if request.method == 'POST':
+        if 'income_submit' in request.POST:
+            income_form = MonthlyIncomeForm(request.POST)
+            if income_form.is_valid():
+                income = income_form.save(commit=False)
+                income.user = request.user
+                income.save()
+                return redirect('monthly')
+        else:
+            income_form = MonthlyIncomeForm()
+
+        if 'expense_submit' in request.POST:
+            expense_form = MonthlyExpenseForm(request.POST)
+            if expense_form.is_valid():
+                expense = expense_form.save(commit=False)
+                expense.user = request.user
+                expense.save()
+                return redirect('monthly')
+        else:
+            expense_form = MonthlyExpenseForm()
+    else:
+        income_form = MonthlyIncomeForm()
+        expense_form = MonthlyExpenseForm()
+
     context = {
         'incomes': incomes,
         'expenses': expenses,
         'total_income': total_income,
         'total_expense': total_expense,
-        'net_income': net_income
+        'net_income': net_income,
+        'income_form': income_form,
+        'expense_form': expense_form
     }
     
     return render(request, 'expenses/monthly.html', context)
-
 @login_required
 def add_monthly_income(request):
     if request.method == 'POST':
